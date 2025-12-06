@@ -1,6 +1,5 @@
 USE sakila;
 
--- 1 Use SQL built-in functions to gain insights relating to the duration of movies:
 -- 1.1 Determine the shortest and longest movie durations and name the values as max_duration and min_duration.
 SELECT MIN(length) AS min_duration, MAX(length) AS max_duration FROM sakila.film;
 -- 1.2 Express the average movie duration in hours and minutes.
@@ -9,15 +8,14 @@ SELECT CONCAT(FLOOR(AVG(length) / 60), "h", FLOOR(AVG(length) % 60), "m") FROM s
 -- 2.1 Calculate the number of days that the company has been operating.
 SELECT DATEDIFF(max(rental_date), min(rental_date)) as DateDiff FROM sakila.rental;
 -- 2.2 Retrieve rental information and add two additional columns to show the month and weekday of the rental. Return 20 rows of results.
-SELECT rental_id, rental_date, DATE_FORMAT (CONVERT(SUBSTRING_INDEX(rental_date, ' ', 2), DATE), "%M" ) AS month_rental, 
-DATE_FORMAT (CONVERT(SUBSTRING_INDEX(rental_date, ' ', 3), DATE), "%W") AS weekday_rental FROM sakila.rental
+SELECT rental_id, rental_date, DATE_FORMAT (rental_date, "%M" ) AS month_rental, DATE_FORMAT (rental_date, "%W") AS weekday_rental FROM sakila.rental
 limit 20;
 -- 2.3 Bonus: Retrieve rental information and add an additional column called DAY_TYPE with values 'weekend' or 'workday', depending on the day of the week.
 SELECT rental_date, DATE_FORMAT (CONVERT(SUBSTRING_INDEX(rental_date, ' ', 3), DATE), "%W") as DAY_TYPE from sakila.rental
 WHERE DATE_FORMAT(CONVERT(SUBSTRING_INDEX(rental_date, ' ', 3), DATE), "%W") in ('Saturday', 'Sunday');
 -- 3.You need to ensure that customers can easily access information about the movie collection. To achieve this, retrieve the film titles and their rental duration. If any rental duration value is NULL, replace it with the string 'Not Available'. Sort the results of the film title in ascending order
-SELECT title, rental_duration from sakila.film
-WHERE  ifnull (NULL, 'Not available') 
+SELECT title, IFNULL(rental_duration, 'Not Available') AS rental_duration
+FROM sakila.film
 ORDER BY title ASC;
 -- 4.Bonus: The marketing team for the movie rental company now needs to create a personalized email campaign for customers. To achieve this, you need to retrieve the concatenated first and last names of customers, along with the first 3 characters of their email address, so that you can address them by their first name and use their email address to send personalized recommendations. The results should be ordered by last name in ascending order to make it easier to use the data.
 SELECT CONCAT(first_name,' ', last_name,' ', email), LEFT(email, 3) FROM sakila.customer
